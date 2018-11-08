@@ -1,21 +1,44 @@
 package com.daimler.sensorstream
 
+import android.content.Context
+import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
 import android.os.Bundle
 import android.support.wearable.activity.WearableActivity
 import android.util.Log
-import com.google.android.gms.wearable.CapabilityClient
-import com.google.android.gms.wearable.CapabilityInfo
-import com.google.android.gms.wearable.ChannelClient
-import com.google.android.gms.wearable.Wearable
+import android.view.View
+import android.widget.Toast
+import com.google.android.gms.wearable.*
+import kotlinx.android.synthetic.main.activity_main.*
+import java.io.BufferedOutputStream
+import java.io.IOException
+import java.io.ObjectOutputStream
+import java.io.OutputStream
 
-class MainActivity : WearableActivity(), CapabilityClient.OnCapabilityChangedListener {
-
+class MainActivity : WearableActivity(), SensorEventListener {
     companion object {
         const val LOG_TAG = "WEAR"
+        const val CAPABILITY_STREAM_SENSOR_DATA = "stream_sensor_data"
     }
 
-    private lateinit var channelClient: ChannelClient
-    private lateinit var capabilityClient: CapabilityClient
+    private val messageClient by lazy(LazyThreadSafetyMode.NONE) {
+        Wearable.getMessageClient(this)
+    }
+    private val channelClient by lazy(LazyThreadSafetyMode.NONE) {
+        Wearable.getChannelClient(this)
+    }
+    private val capabilityClient by lazy(LazyThreadSafetyMode.NONE) {
+        Wearable.getCapabilityClient(this)
+    }
+    private val sensorManager by lazy(LazyThreadSafetyMode.NONE) {
+        getSystemService(Context.SENSOR_SERVICE) as SensorManager
+    }
+
+
+    private var channel: ChannelClient.Channel? = null
+    private var outputStream: ObjectOutputStream? = null
 
     private val callback = object : ChannelClient.ChannelCallback() {
         override fun onChannelClosed(p0: ChannelClient.Channel, p1: Int, p2: Int) {
@@ -37,25 +60,142 @@ class MainActivity : WearableActivity(), CapabilityClient.OnCapabilityChangedLis
 
     override fun onStart() {
         super.onStart()
-        channelClient = Wearable.getChannelClient(this)
-        capabilityClient = Wearable.getCapabilityClient(this)
+        Log.d(LOG_TAG, "start")
         channelClient.registerChannelCallback(callback)
-        capabilityClient.addListener(this, "stream_sensor_data")
     }
 
     override fun onStop() {
-        capabilityClient.removeListener(this)
+        Log.d(LOG_TAG, "stop")
         channelClient.unregisterChannelCallback(callback)
+        stopStreaming()
         super.onStop()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        btn_start.setOnClickListener {
+            onStartButtonClicked()
+        }
+        btn_stop.setOnClickListener {
+            stopStreaming()
+        }
 
     }
 
-    override fun onCapabilityChanged(capabilityInfo: CapabilityInfo) {
-        Log.d(LOG_TAG, "capability changed: " + capabilityInfo.toString())
+    private fun onStartButtonClicked() {
+        Log.d(LOG_TAG, "Starting streaming...")
+        btn_start.isEnabled = false
+        capabilityClient.getCapability(
+                CAPABILITY_STREAM_SENSOR_DATA,
+                CapabilityClient.FILTER_REACHABLE
+        ).addOnSuccessListener { capabilityInfo ->
+            val nearbyNode = capabilityInfo.nodes.firstOrNull { it.isNearby }
+            if (nearbyNode == null) {
+                Toast.makeText(this, "No nearby node found", Toast.LENGTH_SHORT).show()
+                btn_start.isEnabled = true
+            } else {
+                openChannel(nearbyNode)
+            }
+        }.addOnFailureListener {
+            Log.d(LOG_TAG, "Unable to start streaming", it)
+            btn_start.isEnabled = true
+            Toast.makeText(this, "Unable to start streaming", Toast.LENGTH_SHORT).show()
+        }
     }
+
+    private fun openChannel(node: Node) {
+        Log.d(LOG_TAG, "opening channel to node ${node.id}")
+        channelClient.openChannel(
+                node.id,
+                "sensor_data"
+        ).addOnFailureListener {
+            Log.d(LOG_TAG, "failed to open channel to node ${node.id}")
+            btn_start.isEnabled = true
+        }.onSuccessTask {
+            Log.d(LOG_TAG, "successfully opened channel to node ${node.id}")
+            channel = it
+            channelClient.getOutputStream(it!!)
+        }.addOnSuccessListener {
+            Log.d(LOG_TAG, "successfully opened output stream to node ${node.id}")
+            outputStream = ObjectOutputStream(it)
+            startStreaming()
+        }.addOnFailureListener {
+            Log.d(LOG_TAG, "failed to open output stream to node ${node.id}")
+            btn_start.isEnabled = true
+        }
+    }
+
+    private fun closeChannel() {
+        channel?.let {
+            channelClient.close(it)
+            channel = null
+            outputStream = null
+        }
+    }
+
+    private fun startStreaming() {
+        // conditionally enable each sensor
+        if (sensor_accelerometer.isChecked) {
+            enableSensor(Sensor.TYPE_ACCELEROMETER)
+        }
+        if (sensor_gyro.isChecked) {
+            enableSensor(Sensor.TYPE_GYROSCOPE)
+        }
+        if (sensor_magnetic_field.isChecked) {
+            enableSensor(Sensor.TYPE_MAGNETIC_FIELD)
+        }
+        if (sensor_pressure.isChecked) {
+            enableSensor(Sensor.TYPE_PRESSURE)
+        }
+
+        // disable all checkboxes
+        sensor_accelerometer.isEnabled = false
+        sensor_gyro.isEnabled = false
+        sensor_magnetic_field.isEnabled = false
+        sensor_pressure.isEnabled = false
+
+        // show the stop button
+        btn_start.visibility = View.GONE
+        btn_start.isEnabled = true
+        btn_stop.visibility = View.VISIBLE
+    }
+
+    private fun stopStreaming() {
+        disableAllSensors()
+        closeChannel()
+
+        // enable all checkboxes
+        sensor_accelerometer.isEnabled = true
+        sensor_gyro.isEnabled = true
+        sensor_magnetic_field.isEnabled = true
+        sensor_pressure.isEnabled = true
+
+        // show the start button
+        btn_start.visibility = View.VISIBLE
+        btn_stop.visibility = View.GONE
+    }
+
+    private fun enableSensor(type: Int) {
+        val sensor = sensorManager.getDefaultSensor(type)
+        sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_UI)
+    }
+
+    private fun disableAllSensors() {
+        sensorManager.unregisterListener(this)
+    }
+
+    override fun onAccuracyChanged(sensor: Sensor, accuracy: Int) {
+        Log.d(LOG_TAG, "Accuracy of sensor ${sensor.name} changed to $accuracy")
+    }
+
+    override fun onSensorChanged(event: SensorEvent) {
+        val sensorStreamEvent = SensorStreamEvent(event.sensor.type, event.timestamp, event.values.copyOf())
+        try {
+            outputStream?.writeUnshared(sensorStreamEvent)
+        } catch (e: IOException) {
+            Log.d(LOG_TAG, "Unable to send sensor event", e)
+        }
+    }
+
 }
