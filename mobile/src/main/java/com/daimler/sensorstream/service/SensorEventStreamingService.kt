@@ -2,10 +2,10 @@ package com.daimler.sensorstream.service
 
 import android.app.Service
 import android.content.Intent
-import android.os.Looper
 import android.util.Log
 import com.daimler.sensorstream.SensorEventManager
-import com.daimler.sensorstream.SensorStreamEvent
+import com.daimler.sensorstream.SensorDataEvent
+import com.daimler.sensorstream.SensorSelectionEvent
 import com.google.android.gms.wearable.ChannelClient
 import com.google.android.gms.wearable.MessageClient
 import com.google.android.gms.wearable.MessageEvent
@@ -18,6 +18,7 @@ class SensorEventStreamingService : Service(), MessageClient.OnMessageReceivedLi
 
     companion object {
         const val LOG_TAG = "SensorEventStreamingService"
+        const val STRING_SEPARATOR = ";"
     }
 
     private val messageClient by lazy(LazyThreadSafetyMode.NONE) {
@@ -99,18 +100,47 @@ class SensorEventStreamingService : Service(), MessageClient.OnMessageReceivedLi
     inner class SensorDataStreamingThread(private val inputStream: InputStream) : Thread() {
         override fun run() {
             android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_BACKGROUND)
+            val fileWriters = HashMap<Int, PrintWriter>()
+            val dataStream = ObjectInputStream(BufferedInputStream(inputStream))
             try {
-                val dataStream = ObjectInputStream(BufferedInputStream(inputStream))
-                while (!isInterrupted) {
-                    val sensorStreamEvent = dataStream.readObject() as SensorStreamEvent
-                    //Log.d(LOG_TAG, "${sensorStreamEvent.timestamp}: [${sensorStreamEvent.values.joinToString()}]")
-                    SensorEventManager.handleSensorEvent(sensorStreamEvent)
+                // read an object containing the selected sensors first
+                val sensorSelectionEvent = dataStream.readObject() as SensorSelectionEvent
+
+                SensorEventManager.handleSensorSelectionEvent(sensorSelectionEvent)
+
+                val dir = File(getExternalFilesDir(null), System.currentTimeMillis().toString())
+                dir.mkdir()
+
+                sensorSelectionEvent.sensorTypes.associateTo(fileWriters) {
+                    val file = File(dir, "$it.csv")
+                    file.createNewFile()
+                    it to file.printWriter()
                 }
+
+                while (!isInterrupted) {
+                    val sensorDataEvent = dataStream.readObject() as SensorDataEvent
+                    // write the sensor data to a file
+                    val printWriter = fileWriters[sensorDataEvent.sensorType]!!
+                    printWriter.print(sensorDataEvent.timestamp)
+                    printWriter.print(STRING_SEPARATOR)
+                    sensorDataEvent.values.joinTo(printWriter, separator = STRING_SEPARATOR, postfix = "\n")
+                    // broadcast the message to the UI
+                    SensorEventManager.handleSensorDataEvent(sensorDataEvent)
+                }
+
             } catch (e: IOException) {
-                Log.d(LOG_TAG, "Exception during read from stream", e)
-            } catch (e: EOFException) {
-                Log.d(LOG_TAG, "The stream was closed unexpectedly")
+                if (e !is EOFException)
+                    Log.d(LOG_TAG, "Exception during IO operation", e)
+            } catch (e: SecurityException) {
+                Log.d(LOG_TAG, "Exception during file creation", e)
             }
+
+            // close everything
+            dataStream.close()
+            fileWriters.values.forEach {
+                it.close()
+            }
+
         }
     }
 }

@@ -9,7 +9,8 @@ import android.os.Looper
 object SensorEventManager {
 
     interface Observer {
-        fun onSensorEventReceived(sensorEvent: SensorStreamEvent)
+        fun onSensorDataReceived(sensorDataEvent: SensorDataEvent)
+        fun onSensorSelectionReceived(sensorSelectionEvent: SensorSelectionEvent)
     }
 
     var mainHandler = Handler(Looper.getMainLooper())
@@ -26,10 +27,16 @@ object SensorEventManager {
         this.observer = observer
     }
 
-    fun handleSensorEvent(sensorEvent: SensorStreamEvent) {
+    fun handleSensorDataEvent(sensorDataEvent: SensorDataEvent) {
         // TODO: geht das auch irgendwie besser?
         mainHandler.post {
-            observer?.onSensorEventReceived(sensorEvent)
+            observer?.onSensorDataReceived(sensorDataEvent)
+        }
+    }
+
+    fun handleSensorSelectionEvent(sensorSelectionEvent: SensorSelectionEvent) {
+        mainHandler.post {
+            observer?.onSensorSelectionReceived(sensorSelectionEvent)
         }
     }
 

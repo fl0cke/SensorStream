@@ -12,10 +12,8 @@ import android.view.View
 import android.widget.Toast
 import com.google.android.gms.wearable.*
 import kotlinx.android.synthetic.main.activity_main.*
-import java.io.BufferedOutputStream
 import java.io.IOException
 import java.io.ObjectOutputStream
-import java.io.OutputStream
 
 class MainActivity : WearableActivity(), SensorEventListener {
     companion object {
@@ -128,6 +126,7 @@ class MainActivity : WearableActivity(), SensorEventListener {
 
     private fun closeChannel() {
         channel?.let {
+            outputStream?.close()
             channelClient.close(it)
             channel = null
             outputStream = null
@@ -135,17 +134,24 @@ class MainActivity : WearableActivity(), SensorEventListener {
     }
 
     private fun startStreaming() {
+
+        val sensorSelection: MutableList<Int> = mutableListOf()
+
         // conditionally enable each sensor
         if (sensor_accelerometer.isChecked) {
+            sensorSelection.add(Sensor.TYPE_ACCELEROMETER)
             enableSensor(Sensor.TYPE_ACCELEROMETER)
         }
         if (sensor_gyro.isChecked) {
+            sensorSelection.add(Sensor.TYPE_GYROSCOPE)
             enableSensor(Sensor.TYPE_GYROSCOPE)
         }
         if (sensor_magnetic_field.isChecked) {
+            sensorSelection.add(Sensor.TYPE_MAGNETIC_FIELD)
             enableSensor(Sensor.TYPE_MAGNETIC_FIELD)
         }
         if (sensor_pressure.isChecked) {
+            sensorSelection.add(Sensor.TYPE_PRESSURE)
             enableSensor(Sensor.TYPE_PRESSURE)
         }
 
@@ -159,6 +165,9 @@ class MainActivity : WearableActivity(), SensorEventListener {
         btn_start.visibility = View.GONE
         btn_start.isEnabled = true
         btn_stop.visibility = View.VISIBLE
+
+        // send the
+        outputStream?.writeUnshared(SensorSelectionEvent(sensorSelection.toIntArray()))
     }
 
     private fun stopStreaming() {
@@ -190,7 +199,10 @@ class MainActivity : WearableActivity(), SensorEventListener {
     }
 
     override fun onSensorChanged(event: SensorEvent) {
-        val sensorStreamEvent = SensorStreamEvent(event.sensor.type, event.timestamp, event.values.copyOf())
+        val sensorStreamEvent = SensorDataEvent(event.sensor.type, event.timestamp, event.values.copyOf())
+        if (event.sensor.type == Sensor.TYPE_PRESSURE) {
+            Log.d(LOG_TAG, "Received pressure sensor event !")
+        }
         try {
             outputStream?.writeUnshared(sensorStreamEvent)
         } catch (e: IOException) {
