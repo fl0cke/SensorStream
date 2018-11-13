@@ -5,7 +5,7 @@ import android.content.Intent
 import android.util.Log
 import com.daimler.sensorstream.SensorEventManager
 import com.daimler.sensorstream.SensorDataEvent
-import com.daimler.sensorstream.SensorSelectionEvent
+import com.daimler.sensorstream.SensorStreamOpenedEvent
 import com.google.android.gms.wearable.ChannelClient
 import com.google.android.gms.wearable.MessageClient
 import com.google.android.gms.wearable.MessageEvent
@@ -104,14 +104,15 @@ class SensorEventStreamingService : Service(), MessageClient.OnMessageReceivedLi
             val dataStream = ObjectInputStream(BufferedInputStream(inputStream))
             try {
                 // read an object containing the selected sensors first
-                val sensorSelectionEvent = dataStream.readObject() as SensorSelectionEvent
+                val sensorStreamOpenedEvent = dataStream.readObject() as SensorStreamOpenedEvent
 
-                SensorEventManager.handleSensorSelectionEvent(sensorSelectionEvent)
+                SensorEventManager.handleSensorStreamOpenedEvent(sensorStreamOpenedEvent)
 
-                val dir = File(getExternalFilesDir(null), System.currentTimeMillis().toString())
+                val dir = File(getExternalFilesDir(null),
+                        "${sensorStreamOpenedEvent.recordingName}_${System.currentTimeMillis() / 1000}")
                 dir.mkdir()
 
-                sensorSelectionEvent.sensorTypes.associateTo(fileWriters) {
+                sensorStreamOpenedEvent.selectedSensorTypes.associateTo(fileWriters) {
                     val file = File(dir, "$it.csv")
                     file.createNewFile()
                     it to file.printWriter()
@@ -140,6 +141,8 @@ class SensorEventStreamingService : Service(), MessageClient.OnMessageReceivedLi
             fileWriters.values.forEach {
                 it.close()
             }
+
+            SensorEventManager.handleSensorStreamClosedEvent()
 
         }
     }

@@ -26,6 +26,25 @@
                 android:paddingBottom="8dp"
                 app:boxedEdges="left|right">
 
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="32dp"
+                    android:gravity="center"
+                    android:text="Allgemein" />
+
+                <EditText
+                    android:id="@+id/recording_name"
+                    android:hint="Name der Aufzeichnung"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <CheckBox
+                    android:id="@+id/show_realtime_plot"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Realtime Plot" />
+
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="32dp"
@@ -60,7 +79,6 @@
 
         </android.support.wear.widget.BoxInsetLayout>
 
-
     </ScrollView>
 
     <Button
@@ -72,12 +90,12 @@
         android:text="Start" />
 
     <Button
-        android:visibility="gone"
         android:id="@+id/btn_stop"
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:layout_gravity="bottom"
         android:background="@color/red"
-        android:text="STOP" />
+        android:text="STOP"
+        android:visibility="gone" />
 
 </FrameLayout>

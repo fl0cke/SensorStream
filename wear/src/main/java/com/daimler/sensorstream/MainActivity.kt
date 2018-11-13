@@ -82,6 +82,12 @@ class MainActivity : WearableActivity(), SensorEventListener {
     }
 
     private fun onStartButtonClicked() {
+        // check if the recording name is blank
+        if (recording_name.text.isBlank()) {
+            Toast.makeText(this, "Please enter a recording name", Toast.LENGTH_SHORT).show()
+            return
+        }
+
         Log.d(LOG_TAG, "Starting streaming...")
         btn_start.isEnabled = false
         capabilityClient.getCapability(
@@ -134,7 +140,6 @@ class MainActivity : WearableActivity(), SensorEventListener {
     }
 
     private fun startStreaming() {
-
         val sensorSelection: MutableList<Int> = mutableListOf()
 
         // conditionally enable each sensor
@@ -166,8 +171,16 @@ class MainActivity : WearableActivity(), SensorEventListener {
         btn_start.isEnabled = true
         btn_stop.visibility = View.VISIBLE
 
+        // disable the other inputs
+        recording_name.isEnabled = false
+        show_realtime_plot.isEnabled = false
+
+        val recordingName = recording_name.text.toString()
+        val showRealtimePlot = show_realtime_plot.isChecked
+
         // send the
-        outputStream?.writeUnshared(SensorSelectionEvent(sensorSelection.toIntArray()))
+        outputStream?.writeUnshared(SensorStreamOpenedEvent(
+                sensorSelection.toIntArray(), recordingName, showRealtimePlot))
     }
 
     private fun stopStreaming() {
@@ -183,6 +196,10 @@ class MainActivity : WearableActivity(), SensorEventListener {
         // show the start button
         btn_start.visibility = View.VISIBLE
         btn_stop.visibility = View.GONE
+
+        // enable the other inputs
+        recording_name.isEnabled = true
+        show_realtime_plot.isEnabled = true
     }
 
     private fun enableSensor(type: Int) {

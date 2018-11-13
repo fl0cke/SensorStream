@@ -5,11 +5,10 @@ import android.graphics.Color
 import android.hardware.Sensor
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.support.v4.util.Pools
+import android.support.v7.app.ActionBar
+import android.view.Gravity
 import com.daimler.sensorstream.service.SensorEventStreamingService
-import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
-import com.github.mikephil.charting.data.LineDataSet
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity(), SensorEventManager.Observer {
@@ -25,15 +24,35 @@ class MainActivity : AppCompatActivity(), SensorEventManager.Observer {
     private val gyroscopeData = LineData()
     private val magneticFieldData = LineData()
     private val pressureData = LineData()
-    private val entryPool = Pools.SimplePool<Entry>(MAX_POOL_SIZE)
+
+    private val accelerometerDataSetX = SensorDataSet("X", 500)
+    private val accelerometerDataSetY = SensorDataSet("Y", 500)
+    private val accelerometerDataSetZ = SensorDataSet("Z", 500)
+
+    private val gyroscopeDataSetX = SensorDataSet("X", 500)
+    private val gyroscopeDataSetY = SensorDataSet("Y", 500)
+    private val gyroscopeDataSetZ = SensorDataSet("Z", 500)
+
+    private val magneticFieldDataSetX = SensorDataSet("X", 200)
+    private val magneticFieldDataSetY = SensorDataSet("Y", 200)
+    private val magneticFieldDataSetZ = SensorDataSet("Z", 200)
+
+    private val pressureDataSet = SensorDataSet("PRESSURE", 200)
+
+    private var showRealtimePlot = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        supportActionBar!!.displayOptions = ActionBar.DISPLAY_SHOW_CUSTOM or ActionBar.DISPLAY_SHOW_TITLE
+        val view = layoutInflater.inflate(R.layout.view_recording_indicator, null, false)
+        supportActionBar!!.setCustomView(view, ActionBar.LayoutParams(64, 64, Gravity.RIGHT))
+
         startService(Intent(this, SensorEventStreamingService::class.java))
         setupAccelerometerChart()
         setupGyroscopeChart()
-        //setupMagneticFieldChart()
+        setupMagneticFieldChart()
         setupPressureSensorChart()
     }
 
@@ -44,106 +63,101 @@ class MainActivity : AppCompatActivity(), SensorEventManager.Observer {
     }
 
     private fun setupAccelerometerChart() {
-        val dataSetX = LineDataSet(ArrayList(), "X")
-        dataSetX.setColor(Color.RED, 255)
-        dataSetX.setDrawValues(false)
-        dataSetX.setDrawCircles(false)
-        accelerometerData.addDataSet(dataSetX)
+        accelerometerDataSetX.setColor(Color.RED, 255)
+        accelerometerDataSetX.setDrawValues(false)
+        accelerometerDataSetX.setDrawCircles(false)
+        accelerometerData.addDataSet(accelerometerDataSetX)
 
-        val dataSetY = LineDataSet(ArrayList(), "Y")
-        dataSetY.setColor(Color.BLUE, 255)
-        dataSetY.setDrawValues(false)
-        dataSetY.setDrawCircles(false)
-        accelerometerData.addDataSet(dataSetY)
+        accelerometerDataSetY.setColor(Color.BLUE, 255)
+        accelerometerDataSetY.setDrawValues(false)
+        accelerometerDataSetY.setDrawCircles(false)
+        accelerometerData.addDataSet(accelerometerDataSetY)
 
-        val dataSetZ = LineDataSet(ArrayList(), "Z")
-        dataSetZ.setColor(Color.GREEN, 255)
-        dataSetZ.setDrawValues(false)
-        dataSetZ.setDrawCircles(false)
-        accelerometerData.addDataSet(dataSetZ)
+        accelerometerDataSetZ.setColor(Color.GREEN, 255)
+        accelerometerDataSetZ.setDrawValues(false)
+        accelerometerDataSetZ.setDrawCircles(false)
+        accelerometerData.addDataSet(accelerometerDataSetZ)
 
         with(chart_accelerometer) {
             disableScroll()
             description.text = "Accelerometer"
             data = accelerometerData
             xAxis.setDrawLabels(false)
+            axisLeft.setDrawLabels(false)
             invalidate()
         }
     }
 
     private fun setupGyroscopeChart() {
-        val dataSetX = LineDataSet(ArrayList(), "X")
-        dataSetX.setColor(Color.RED, 255)
-        dataSetX.setDrawValues(false)
-        dataSetX.setDrawCircles(false)
-        gyroscopeData.addDataSet(dataSetX)
+        gyroscopeDataSetX.setColor(Color.RED, 255)
+        gyroscopeDataSetX.setDrawValues(false)
+        gyroscopeDataSetX.setDrawCircles(false)
+        gyroscopeData.addDataSet(gyroscopeDataSetX)
 
-        val dataSetY = LineDataSet(ArrayList(), "Y")
-        dataSetY.setColor(Color.BLUE, 255)
-        dataSetY.setDrawValues(false)
-        dataSetY.setDrawCircles(false)
-        gyroscopeData.addDataSet(dataSetY)
+        gyroscopeDataSetY.setColor(Color.BLUE, 255)
+        gyroscopeDataSetY.setDrawValues(false)
+        gyroscopeDataSetY.setDrawCircles(false)
+        gyroscopeData.addDataSet(gyroscopeDataSetY)
 
-        val dataSetZ = LineDataSet(ArrayList(), "Z")
-        dataSetZ.setColor(Color.GREEN, 255)
-        dataSetZ.setDrawValues(false)
-        dataSetZ.setDrawCircles(false)
-        gyroscopeData.addDataSet(dataSetZ)
+        gyroscopeDataSetZ.setColor(Color.GREEN, 255)
+        gyroscopeDataSetZ.setDrawValues(false)
+        gyroscopeDataSetZ.setDrawCircles(false)
+        accelerometerData.addDataSet(gyroscopeDataSetZ)
 
         with(chart_gyroscope) {
             disableScroll()
             description.text = "Gyroscope"
             data = gyroscopeData
             xAxis.setDrawLabels(false)
+            axisLeft.setDrawLabels(false)
             invalidate()
         }
     }
 
     private fun setupMagneticFieldChart() {
-        val dataSetX = LineDataSet(ArrayList(), "X")
-        dataSetX.setColor(Color.RED, 255)
-        dataSetX.setDrawValues(false)
-        dataSetX.setDrawCircles(false)
-        magneticFieldData.addDataSet(dataSetX)
+        magneticFieldDataSetX.setColor(Color.RED, 255)
+        magneticFieldDataSetX.setDrawValues(false)
+        magneticFieldDataSetX.setDrawCircles(false)
+        magneticFieldData.addDataSet(magneticFieldDataSetX)
 
-        val dataSetY = LineDataSet(ArrayList(), "Y")
-        dataSetY.setColor(Color.BLUE, 255)
-        dataSetY.setDrawValues(false)
-        dataSetY.setDrawCircles(false)
-        magneticFieldData.addDataSet(dataSetY)
+        magneticFieldDataSetY.setColor(Color.BLUE, 255)
+        magneticFieldDataSetY.setDrawValues(false)
+        magneticFieldDataSetY.setDrawCircles(false)
+        magneticFieldData.addDataSet(magneticFieldDataSetY)
 
-        val dataSetZ = LineDataSet(ArrayList(), "Z")
-        dataSetZ.setColor(Color.GREEN, 255)
-        dataSetZ.setDrawValues(false)
-        dataSetZ.setDrawCircles(false)
-        magneticFieldData.addDataSet(dataSetZ)
-/*
+        magneticFieldDataSetZ.setColor(Color.GREEN, 255)
+        magneticFieldDataSetZ.setDrawValues(false)
+        magneticFieldDataSetZ.setDrawCircles(false)
+        magneticFieldData.addDataSet(magneticFieldDataSetZ)
+
         with(chart_magnetic_field) {
             disableScroll()
             description.text = "Magnetic Field"
             data = magneticFieldData
             xAxis.setDrawLabels(false)
+            axisLeft.setDrawLabels(false)
             invalidate()
-        }*/
+        }
     }
 
     private fun setupPressureSensorChart() {
-        val dataSet = LineDataSet(ArrayList(), "Pressure")
-        dataSet.setColor(Color.RED, 255)
-        dataSet.setDrawValues(false)
-        dataSet.setDrawCircles(false)
-        pressureData.addDataSet(dataSet)
+        pressureDataSet.setColor(Color.RED, 255)
+        pressureDataSet.setDrawValues(false)
+        pressureDataSet.setDrawCircles(false)
+        pressureData.addDataSet(pressureDataSet)
 
         with(chart_pressure) {
             disableScroll()
             description.text = "Pressure"
             data = pressureData
             xAxis.setDrawLabels(false)
+            axisLeft.setDrawLabels(false)
             invalidate()
         }
     }
 
     override fun onSensorDataReceived(sensorDataEvent: SensorDataEvent) {
+        if (!showRealtimePlot) return
         when (sensorDataEvent.sensorType) {
             Sensor.TYPE_ACCELEROMETER -> handleAccelerometerEvent(sensorDataEvent)
             Sensor.TYPE_PRESSURE -> handlePressureSensorEvent(sensorDataEvent)
@@ -152,33 +166,34 @@ class MainActivity : AppCompatActivity(), SensorEventManager.Observer {
         }
     }
 
-    override fun onSensorSelectionReceived(sensorSelectionEvent: SensorSelectionEvent) {
+    override fun onSensorStreamStarted(sensorStreamOpenedEvent: SensorStreamOpenedEvent) {
         // clear all entries
         chart_accelerometer.data.dataSets.forEach { it.clear() }
         chart_accelerometer.invalidate()
+
+        chart_gyroscope.data.dataSets.forEach { it.clear() }
+        chart_gyroscope.invalidate()
+
+        chart_magnetic_field.data.dataSets.forEach { it.clear() }
+        chart_magnetic_field.invalidate()
+
+        chart_pressure.data.dataSets.forEach { it.clear() }
+        chart_pressure.invalidate()
+
+        showRealtimePlot = sensorStreamOpenedEvent.showRealtimePlot
+        supportActionBar?.customView?.isActivated = true
+    }
+
+    override fun onSensorStreamClosed() {
+        supportActionBar?.customView?.isActivated = false
     }
 
     private fun handleAccelerometerEvent(sensorEvent: SensorDataEvent) {
         val x = sensorEvent.timestamp.toFloat()
 
-        val entryX = Entry(x, sensorEvent.values[0])
-        val entryY = Entry(x, sensorEvent.values[1])
-        val entryZ = Entry(x, sensorEvent.values[2])
-
-        val dataSetX = accelerometerData.dataSets[0]
-        dataSetX.addEntry(entryX)
-
-        val dataSetY = accelerometerData.dataSets[1]
-        dataSetY.addEntry(entryY)
-
-        val dataSetZ = accelerometerData.dataSets[2]
-        dataSetZ.addEntry(entryZ)
-
-        if (dataSetX.entryCount > MAX_ENTRY_COUNT) {
-            dataSetX.removeFirst()
-            dataSetY.removeFirst()
-            dataSetZ.removeFirst()
-        }
+        accelerometerDataSetX.addSensorReading(x, sensorEvent.values[0])
+        accelerometerDataSetY.addSensorReading(x, sensorEvent.values[1])
+        accelerometerDataSetZ.addSensorReading(x, sensorEvent.values[2])
 
         with(chart_accelerometer) {
             data.notifyDataChanged()
@@ -192,14 +207,7 @@ class MainActivity : AppCompatActivity(), SensorEventManager.Observer {
     private fun handlePressureSensorEvent(sensorEvent: SensorDataEvent) {
         val x = sensorEvent.timestamp.toFloat()
 
-        val entry = Entry(x, sensorEvent.values[0])
-
-        val dataSet = pressureData.dataSets[0]
-        dataSet.addEntry(entry)
-
-        if (dataSet.entryCount > MAX_ENTRY_COUNT) {
-            dataSet.removeFirst()
-        }
+        pressureDataSet.addSensorReading(x, sensorEvent.values[0])
 
         with(chart_pressure) {
             data.notifyDataChanged()
@@ -213,24 +221,9 @@ class MainActivity : AppCompatActivity(), SensorEventManager.Observer {
     private fun handleGyroscopeEvent(sensorEvent: SensorDataEvent) {
         val x = sensorEvent.timestamp.toFloat()
 
-        val entryX = Entry(x, sensorEvent.values[0])
-        val entryY = Entry(x, sensorEvent.values[1])
-        val entryZ = Entry(x, sensorEvent.values[2])
-
-        val dataSetX = gyroscopeData.dataSets[0]
-        dataSetX.addEntry(entryX)
-
-        val dataSetY = gyroscopeData.dataSets[1]
-        dataSetY.addEntry(entryY)
-
-        val dataSetZ = gyroscopeData.dataSets[2]
-        dataSetZ.addEntry(entryZ)
-
-        if (dataSetX.entryCount > MAX_ENTRY_COUNT) {
-            dataSetX.removeFirst()
-            dataSetY.removeFirst()
-            dataSetZ.removeFirst()
-        }
+        gyroscopeDataSetX.addSensorReading(x, sensorEvent.values[0])
+        gyroscopeDataSetY.addSensorReading(x, sensorEvent.values[1])
+        gyroscopeDataSetZ.addSensorReading(x, sensorEvent.values[2])
 
         with(chart_gyroscope) {
             data.notifyDataChanged()
@@ -244,31 +237,16 @@ class MainActivity : AppCompatActivity(), SensorEventManager.Observer {
     private fun handleMagneticFieldSensorEvent(sensorEvent: SensorDataEvent) {
         val x = sensorEvent.timestamp.toFloat()
 
-        val entryX = Entry(x, sensorEvent.values[0])
-        val entryY = Entry(x, sensorEvent.values[1])
-        val entryZ = Entry(x, sensorEvent.values[2])
+        magneticFieldDataSetX.addSensorReading(x, sensorEvent.values[0])
+        magneticFieldDataSetY.addSensorReading(x, sensorEvent.values[1])
+        magneticFieldDataSetZ.addSensorReading(x, sensorEvent.values[2])
 
-        val dataSetX = magneticFieldData.dataSets[0]
-        dataSetX.addEntry(entryX)
-
-        val dataSetY = magneticFieldData.dataSets[1]
-        dataSetY.addEntry(entryY)
-
-        val dataSetZ = magneticFieldData.dataSets[2]
-        dataSetZ.addEntry(entryZ)
-
-        if (dataSetX.entryCount > MAX_ENTRY_COUNT) {
-            dataSetX.removeFirst()
-            dataSetY.removeFirst()
-            dataSetZ.removeFirst()
-        }
-
-      /*  with(chart_magnetic_field) {
+        with(chart_magnetic_field) {
             data.notifyDataChanged()
             notifyDataSetChanged()
             setVisibleXRange(RANGE, RANGE)
             moveViewToX(x)
             invalidate()
-        }*/
+        }
     }
 }

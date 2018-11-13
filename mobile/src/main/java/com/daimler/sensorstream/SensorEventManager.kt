@@ -10,7 +10,8 @@ object SensorEventManager {
 
     interface Observer {
         fun onSensorDataReceived(sensorDataEvent: SensorDataEvent)
-        fun onSensorSelectionReceived(sensorSelectionEvent: SensorSelectionEvent)
+        fun onSensorStreamStarted(sensorStreamOpenedEvent: SensorStreamOpenedEvent)
+        fun onSensorStreamClosed()
     }
 
     var mainHandler = Handler(Looper.getMainLooper())
@@ -34,9 +35,15 @@ object SensorEventManager {
         }
     }
 
-    fun handleSensorSelectionEvent(sensorSelectionEvent: SensorSelectionEvent) {
+    fun handleSensorStreamOpenedEvent(sensorStreamOpenedEvent: SensorStreamOpenedEvent) {
         mainHandler.post {
-            observer?.onSensorSelectionReceived(sensorSelectionEvent)
+            observer?.onSensorStreamStarted(sensorStreamOpenedEvent)
+        }
+    }
+
+    fun handleSensorStreamClosedEvent() {
+        mainHandler.post {
+            observer?.onSensorStreamClosed()
         }
     }
 
