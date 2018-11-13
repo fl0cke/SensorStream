@@ -19,6 +19,7 @@
             android:layout_height="wrap_content">
 
             <LinearLayout
+                android:id="@+id/container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
@@ -40,10 +41,10 @@
                     android:layout_height="wrap_content" />
 
                 <CheckBox
-                    android:id="@+id/show_realtime_plot"
+                    android:id="@+id/live_preview"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Realtime Plot" />
+                    android:text="Live Preview" />
 
                 <TextView
                     android:layout_width="match_parent"
@@ -74,6 +75,54 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Pressure" />
+
+                <CheckBox
+                    android:id="@+id/sensor_gravity"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Gravity" />
+
+                <CheckBox
+                    android:id="@+id/sensor_linear_acceleration"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Linear Acceleration" />
+
+                <CheckBox
+                    android:id="@+id/sensor_rotation_vector"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Rotation Vector" />
+
+                <CheckBox
+                    android:id="@+id/sensor_game_rotation_vector"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Game Rotation Vector" />
+
+                <CheckBox
+                    android:id="@+id/sensor_geomagnetic_rotation_vector"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Geomagnetic Rotation Vector" />
+
+  <!--              <CheckBox
+                    android:id="@+id/sensor_magnetic_field_uncalibrated"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Magnetic Field UC" />
+
+                <CheckBox
+                    android:id="@+id/sensor_gyroscope_uncalibrated"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Gyroscope UC" />
+
+                <CheckBox
+                    android:id="@+id/sensor_acceleration_uncalibrated"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Acceleration UC" />-->
 
             </LinearLayout>
 

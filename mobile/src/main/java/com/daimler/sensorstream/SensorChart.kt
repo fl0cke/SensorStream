@@ -1,6 +1,7 @@
 package com.daimler.sensorstream
 
 import android.graphics.Color
+import android.util.Log
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.data.LineData
 
@@ -18,7 +19,7 @@ class SensorChart(val sensorType: Int, private val chart: LineChart) {
     init {
 
         dataSets = List(sensorMetaData.valueCount) {
-            val dataSet = SensorDataSet(sensorMetaData.axisLabels[it], 500)
+            val dataSet = SensorDataSet(sensorMetaData.axisLabels[it], 1000)
             dataSet.setColor(colors[it], 255)
             dataSet.setDrawValues(false)
             dataSet.setDrawCircles(false)
@@ -26,21 +27,19 @@ class SensorChart(val sensorType: Int, private val chart: LineChart) {
         }
 
         data = LineData(dataSets)
-        with(chart) {
-            disableScroll()
-            description.text = sensorMetaData.name
-            data = data
-            xAxis.setDrawLabels(false)
-            axisLeft.setDrawLabels(false)
-            invalidate()
-        }
+        chart.disableScroll()
+        chart.description.text = sensorMetaData.name
+        chart.data = data
+        chart.xAxis.setDrawLabels(false)
+        chart.axisLeft.setDrawLabels(false)
+        chart.invalidate()
     }
 
     fun appendSensorData(event: SensorDataEvent) {
         val x = event.timestamp.toFloat()
 
-        event.values.forEachIndexed { index, value ->
-            dataSets[index].addSensorReading(x, value)
+        for (i in 0 until sensorMetaData.valueCount) {
+            dataSets[i].addSensorReading(x, event.values[i])
         }
 
         with(chart) {

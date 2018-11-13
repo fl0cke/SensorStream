@@ -159,12 +159,52 @@ class MainActivity : WearableActivity(), SensorEventListener {
             sensorSelection.add(Sensor.TYPE_PRESSURE)
             enableSensor(Sensor.TYPE_PRESSURE)
         }
+        if (sensor_gravity.isChecked) {
+            sensorSelection.add(Sensor.TYPE_GRAVITY)
+            enableSensor(Sensor.TYPE_GRAVITY)
+        }
+        if (sensor_linear_acceleration.isChecked) {
+            sensorSelection.add(Sensor.TYPE_LINEAR_ACCELERATION)
+            enableSensor(Sensor.TYPE_LINEAR_ACCELERATION)
+        }
+        if (sensor_rotation_vector.isChecked) {
+            sensorSelection.add(Sensor.TYPE_ROTATION_VECTOR)
+            enableSensor(Sensor.TYPE_ROTATION_VECTOR)
+        }
+        if (sensor_game_rotation_vector.isChecked) {
+            sensorSelection.add(Sensor.TYPE_GAME_ROTATION_VECTOR)
+            enableSensor(Sensor.TYPE_GAME_ROTATION_VECTOR)
+        }
+        if (sensor_geomagnetic_rotation_vector.isChecked) {
+            sensorSelection.add(Sensor.TYPE_GEOMAGNETIC_ROTATION_VECTOR)
+            enableSensor(Sensor.TYPE_GEOMAGNETIC_ROTATION_VECTOR)
+        }
+      /*  if (sensor_magnetic_field_uncalibrated.isChecked) {
+            sensorSelection.add(Sensor.TYPE_MAGNETIC_FIELD_UNCALIBRATED)
+            enableSensor(Sensor.TYPE_MAGNETIC_FIELD_UNCALIBRATED)
+        }
+        if (sensor_gyroscope_uncalibrated.isChecked) {
+            sensorSelection.add(Sensor.TYPE_GYROSCOPE_UNCALIBRATED)
+            enableSensor(Sensor.TYPE_GYROSCOPE_UNCALIBRATED)
+        }
+        if (sensor_acceleration_uncalibrated.isChecked) {
+            sensorSelection.add(Sensor.TYPE_ACCELEROMETER_UNCALIBRATED)
+            enableSensor(Sensor.TYPE_ACCELEROMETER_UNCALIBRATED)
+        }*/
 
         // disable all checkboxes
         sensor_accelerometer.isEnabled = false
         sensor_gyro.isEnabled = false
         sensor_magnetic_field.isEnabled = false
         sensor_pressure.isEnabled = false
+        sensor_gravity.isEnabled = false
+        sensor_linear_acceleration.isEnabled = false
+        sensor_game_rotation_vector.isEnabled = false
+        sensor_rotation_vector.isEnabled = false
+        sensor_geomagnetic_rotation_vector.isEnabled = false
+     /*   sensor_acceleration_uncalibrated.isEnabled = false
+        sensor_gyroscope_uncalibrated.isEnabled = false
+        sensor_magnetic_field_uncalibrated.isEnabled = false*/
 
         // show the stop button
         btn_start.visibility = View.GONE
@@ -173,14 +213,14 @@ class MainActivity : WearableActivity(), SensorEventListener {
 
         // disable the other inputs
         recording_name.isEnabled = false
-        show_realtime_plot.isEnabled = false
+        live_preview.isEnabled = false
 
         val recordingName = recording_name.text.toString()
-        val showRealtimePlot = show_realtime_plot.isChecked
+        val showLivePreview = live_preview.isChecked
 
         // send the
         outputStream?.writeUnshared(SensorStreamOpenedEvent(
-                sensorSelection.toIntArray(), recordingName, showRealtimePlot))
+                sensorSelection.toIntArray(), recordingName, showLivePreview))
     }
 
     private fun stopStreaming() {
@@ -192,6 +232,14 @@ class MainActivity : WearableActivity(), SensorEventListener {
         sensor_gyro.isEnabled = true
         sensor_magnetic_field.isEnabled = true
         sensor_pressure.isEnabled = true
+        sensor_gravity.isEnabled = true
+        sensor_linear_acceleration.isEnabled = true
+        sensor_game_rotation_vector.isEnabled = true
+        sensor_rotation_vector.isEnabled = true
+        sensor_geomagnetic_rotation_vector.isEnabled = true
+        /*sensor_acceleration_uncalibrated.isEnabled = true
+        sensor_gyroscope_uncalibrated.isEnabled = true
+        sensor_magnetic_field_uncalibrated.isEnabled = true*/
 
         // show the start button
         btn_start.visibility = View.VISIBLE
@@ -199,7 +247,7 @@ class MainActivity : WearableActivity(), SensorEventListener {
 
         // enable the other inputs
         recording_name.isEnabled = true
-        show_realtime_plot.isEnabled = true
+        live_preview.isEnabled = true
     }
 
     private fun enableSensor(type: Int) {
@@ -217,9 +265,6 @@ class MainActivity : WearableActivity(), SensorEventListener {
 
     override fun onSensorChanged(event: SensorEvent) {
         val sensorStreamEvent = SensorDataEvent(event.sensor.type, event.timestamp, event.values.copyOf())
-        if (event.sensor.type == Sensor.TYPE_PRESSURE) {
-            Log.d(LOG_TAG, "Received pressure sensor event !")
-        }
         try {
             outputStream?.writeUnshared(sensorStreamEvent)
         } catch (e: IOException) {
