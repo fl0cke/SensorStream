@@ -45,6 +45,7 @@
                     android:gravity="center"
                     android:text="Display Mode" />
 
+
                 <Spinner
                     android:id="@+id/display_mode"
                     android:entries="@array/display_modes"

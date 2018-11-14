@@ -1,18 +1,196 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:padding="16dp"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".TaggingActivity">
 
-
     <TextView
-        android:textAppearance="@style/TextAppearance.AppCompat.Display1"
-        android:textColor="@color/colorAccent"
-        android:text="Tagging"
-        android:layout_gravity="center"
-        android:layout_width="wrap_content"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:id="@+id/label_movement"
+        android:textAlignment="center"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_width="match_parent"
+        android:text="Walking"
         android:layout_height="wrap_content" />
 
-</FrameLayout>
+    <Button
+        android:id="@+id/left_turn"
+        android:layout_width="0dp"
+        android:layout_height="64dp"
+        android:autoSizeMaxTextSize="24dp"
+        android:autoSizeTextType="uniform"
+        android:text="Left Turn"
+        android:textColor="@color/colorAccent"
+        app:layout_constraintTop_toBottomOf="@id/label_movement"
+        app:layout_constraintEnd_toStartOf="@id/right_turn"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        app:layout_constraintTop_toBottomOf="@id/label_movement"
+        android:id="@+id/right_turn"
+        android:layout_width="0dp"
+        android:layout_height="64dp"
+        android:autoSizeMaxTextSize="24dp"
+        android:autoSizeTextType="uniform"
+        android:text="Right Turn"
+        android:textColor="@color/colorAccent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/left_turn" />
+
+    <Button
+        android:id="@+id/stairs_up"
+        android:layout_width="0dp"
+        android:layout_height="64dp"
+        android:autoSizeMaxTextSize="24dp"
+        android:autoSizeTextType="uniform"
+        android:text="Stairs Up"
+        android:textColor="@color/colorAccent"
+        app:layout_constraintTop_toBottomOf="@id/left_turn"
+        app:layout_constraintEnd_toStartOf="@id/stairs_down"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        app:layout_constraintTop_toBottomOf="@id/right_turn"
+        android:id="@+id/stairs_down"
+        android:layout_width="0dp"
+        android:layout_height="64dp"
+        android:autoSizeMaxTextSize="24dp"
+        android:autoSizeTextType="uniform"
+        android:text="Stairs Down"
+        android:textColor="@color/colorAccent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/stairs_up" />
+
+    <TextView
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:id="@+id/label_elevator"
+        android:textAlignment="center"
+        app:layout_constraintTop_toBottomOf="@id/stairs_up"
+        android:layout_width="match_parent"
+        android:text="Elevator"
+        android:layout_height="wrap_content" />
+
+    <Button
+        app:layout_constraintTop_toBottomOf="@id/label_elevator"
+        android:id="@+id/elevator_up_start"
+        android:layout_width="0dp"
+        android:layout_height="64dp"
+        android:autoSizeMaxTextSize="24dp"
+        android:autoSizeTextType="uniform"
+        android:text="Elevator Up Start"
+        android:textColor="@color/colorAccent"
+        app:layout_constraintEnd_toStartOf="@id/elevator_up_stop"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        app:layout_constraintTop_toBottomOf="@id/label_elevator"
+        android:id="@+id/elevator_up_stop"
+        android:layout_width="0dp"
+        android:layout_height="64dp"
+        android:autoSizeMaxTextSize="24dp"
+        android:autoSizeTextType="uniform"
+        android:text="Elevator Up Stop"
+        android:textColor="@color/colorAccent"
+        app:layout_constraintStart_toEndOf="@id/elevator_up_start"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <Button
+        app:layout_constraintTop_toBottomOf="@id/elevator_up_start"
+        android:id="@+id/elevator_down_start"
+        android:layout_width="0dp"
+        android:layout_height="64dp"
+        android:autoSizeMaxTextSize="24dp"
+        android:autoSizeTextType="uniform"
+        android:text="Elevator Down Start"
+        android:textColor="@color/colorAccent"
+        app:layout_constraintEnd_toStartOf="@id/elevator_down_stop"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        app:layout_constraintTop_toBottomOf="@id/elevator_up_stop"
+        android:id="@+id/elevator_down_stop"
+        android:layout_width="0dp"
+        android:layout_height="64dp"
+        android:autoSizeMaxTextSize="24dp"
+        android:autoSizeTextType="uniform"
+        android:text="Elevator Down Stop"
+        android:textColor="@color/colorAccent"
+        app:layout_constraintStart_toEndOf="@id/elevator_down_start"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <TextView
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:id="@+id/label_mics"
+        android:textAlignment="center"
+        app:layout_constraintTop_toBottomOf="@id/elevator_down_stop"
+        android:layout_width="match_parent"
+        android:text="Miscellaneous"
+        android:layout_height="wrap_content" />
+
+    <Button
+        app:layout_constraintTop_toBottomOf="@id/label_mics"
+        android:id="@+id/opening_door"
+        android:layout_width="0dp"
+        android:layout_height="64dp"
+        android:autoSizeMaxTextSize="24dp"
+        android:autoSizeTextType="uniform"
+        android:text="Opening Door"
+        android:textColor="@color/colorAccent"
+        app:layout_constraintEnd_toStartOf="@id/waiting"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        app:layout_constraintTop_toBottomOf="@id/label_mics"
+        android:id="@+id/waiting"
+        android:layout_width="0dp"
+        android:layout_height="64dp"
+        android:autoSizeMaxTextSize="24dp"
+        android:autoSizeTextType="uniform"
+        android:text="Waiting"
+        android:textColor="@color/colorAccent"
+        app:layout_constraintStart_toEndOf="@id/opening_door"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+
+    <Button
+        app:layout_constraintTop_toBottomOf="@id/opening_door"
+        android:id="@+id/raising_hand"
+        android:layout_width="0dp"
+        android:layout_height="64dp"
+        android:autoSizeMaxTextSize="24dp"
+        android:autoSizeTextType="uniform"
+        android:text="Raising Hand"
+        android:textColor="@color/colorAccent"
+        app:layout_constraintEnd_toStartOf="@id/turning_on_the_spot"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        app:layout_constraintTop_toBottomOf="@id/waiting"
+        android:id="@+id/turning_on_the_spot"
+        android:layout_width="0dp"
+        android:layout_height="64dp"
+        android:autoSizeMaxTextSize="24dp"
+        android:autoSizeTextType="uniform"
+        android:text="Turning on the spot"
+        android:textColor="@color/colorAccent"
+        app:layout_constraintStart_toEndOf="@id/raising_hand"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <Button
+        app:layout_constraintTop_toBottomOf="@id/turning_on_the_spot"
+        android:id="@+id/something_else"
+        android:layout_width="0dp"
+        android:layout_height="64dp"
+        android:autoSizeMaxTextSize="24dp"
+        android:autoSizeTextType="uniform"
+        android:text="Something Else"
+        android:textColor="@color/colorAccent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+
+
+</android.support.constraint.ConstraintLayout>

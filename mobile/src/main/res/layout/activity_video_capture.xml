@@ -4,15 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:keepScreenOn="true"
+    android:id="@+id/camera"
     tools:context=".VideoCaptureActivity">
-
-
-    <TextView
-        android:textAppearance="@style/TextAppearance.AppCompat.Display1"
-        android:textColor="@color/colorAccent"
-        android:text="video capture"
-        android:layout_gravity="center"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
 
 </FrameLayout>

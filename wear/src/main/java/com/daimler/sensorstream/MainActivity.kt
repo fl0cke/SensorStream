@@ -222,6 +222,7 @@ class MainActivity : WearableActivity(), SensorEventListener {
             0 -> DisplayMode.NOTHING
             1 -> DisplayMode.LIVE_PREVIEW
             2 -> DisplayMode.TAGGING
+            3 -> DisplayMode.VIDEO_CAPTURE
             else -> throw IllegalArgumentException()
         }
 

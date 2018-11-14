@@ -16,13 +16,22 @@ object SensorEventManager : LifecycleObserver {
 
     var mainHandler = Handler(Looper.getMainLooper())
 
-    var observer: SensorDataObserver? = null
+    private val observers: MutableList<SensorDataObserver> = mutableListOf()
+
+    fun registerObserver(sensorDataObserver: SensorDataObserver) {
+        observers.add(sensorDataObserver)
+    }
+
+    fun unregisterObserver(sensorDataObserver: SensorDataObserver) {
+        observers.remove(sensorDataObserver)
+    }
 
     fun handleSensorDataEvent(sensorDataEvent: SensorDataEvent) {
         // TODO: geht das auch irgendwie besser?
         mainHandler.post {
-            observer?.onSensorDataReceived(sensorDataEvent)
+            observers.forEach { it.onSensorDataReceived(sensorDataEvent) }
         }
     }
+
 
 }

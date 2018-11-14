@@ -116,7 +116,22 @@ class SensorEventStreamingService : Service(), MessageClient.OnMessageReceivedLi
                     it to file.printWriter()
                 }
 
-                startDisplayActivity(sensorStreamOpenedEvent)
+                val intent = when (sensorStreamOpenedEvent.displayMode) {
+                    DisplayMode.NOTHING -> Intent(applicationContext, PlaceholderActivity::class.java)
+                    DisplayMode.LIVE_PREVIEW ->
+                        Intent(applicationContext, LivePreviewActivity::class.java).apply {
+                            putExtra(LivePreviewActivity.EXTRA_SENSOR_TYPES, sensorStreamOpenedEvent.selectedSensorTypes)
+                        }
+                    DisplayMode.TAGGING ->
+                        Intent(applicationContext, TaggingActivity::class.java).apply {
+                        }
+                    DisplayMode.VIDEO_CAPTURE ->
+                        Intent(applicationContext, VideoCaptureActivity::class.java).apply {
+                            putExtra(VideoCaptureActivity.EXTRA_VIDEO_LOCATION, dir.path)
+                        }
+                }
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+                startActivity(intent)
 
                 while (!isInterrupted) {
                     val sensorDataEvent = dataStream.readObject() as SensorDataEvent
@@ -126,7 +141,6 @@ class SensorEventStreamingService : Service(), MessageClient.OnMessageReceivedLi
                     printWriter.print(STRING_SEPARATOR)
                     sensorDataEvent.values.joinTo(printWriter, separator = STRING_SEPARATOR, postfix = "\n")
                     // broadcast the message to the UI
-                    Log.d(LOG_TAG, SensorEventManager.observer.toString())
                     SensorEventManager.handleSensorDataEvent(sensorDataEvent)
                 }
 
@@ -149,23 +163,5 @@ class SensorEventStreamingService : Service(), MessageClient.OnMessageReceivedLi
             startActivity(intent)
 
         }
-    }
-
-    private fun startDisplayActivity(sensorStreamOpenedEvent: SensorStreamOpenedEvent) {
-        val intent = when (sensorStreamOpenedEvent.displayMode) {
-            DisplayMode.NOTHING -> Intent(applicationContext, PlaceholderActivity::class.java)
-            DisplayMode.LIVE_PREVIEW ->
-                Intent(applicationContext, LivePreviewActivity::class.java).apply {
-                    putExtra(LivePreviewActivity.EXTRA_SENSOR_TYPES, sensorStreamOpenedEvent.selectedSensorTypes)
-                }
-            DisplayMode.TAGGING ->
-                Intent(applicationContext, TaggingActivity::class.java).apply {
-                }
-            DisplayMode.VIDEO_CAPTURE ->
-                Intent(applicationContext, VideoCaptureActivity::class.java).apply {
-                }
-        }
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-        startActivity(intent)
     }
 }

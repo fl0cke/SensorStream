@@ -1,5 +1,6 @@
 package com.daimler.sensorstream
 
+import android.arch.lifecycle.LiveData
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -13,31 +14,30 @@ class LivePreviewActivity : AppCompatActivity(), SensorEventManager.SensorDataOb
         const val EXTRA_SENSOR_TYPES = "SENSOR_TYPES"
     }
 
-    private val sensorCharts = mutableMapOf<Int, SensorChart>()
+    private lateinit var sensorCharts: Map<Int, SensorChart>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_live_preview)
 
         val sensorTypes = intent.getIntArrayExtra(EXTRA_SENSOR_TYPES)
-        sensorTypes.associateTo(sensorCharts) {
+        sensorCharts = sensorTypes.associate {
             val chartView = layoutInflater.inflate(R.layout.view_chart, charts, false) as LineChart
             charts.addView(chartView)
             it to SensorChart(it, chartView)
         }
 
-        SensorEventManager.observer = this
-
+        SensorEventManager.registerObserver(this)
     }
+
 
     override fun onDestroy() {
         // TODO: there is a strange race condition where this is called before
-        //SensorEventManager.observer = null
+        SensorEventManager.unregisterObserver(this)
         super.onDestroy()
     }
 
     override fun onSensorDataReceived(sensorDataEvent: SensorDataEvent) {
-        Log.d(LOG_TAG, "what")
         sensorCharts[sensorDataEvent.sensorType]!!.appendSensorData(sensorDataEvent)
     }
 
