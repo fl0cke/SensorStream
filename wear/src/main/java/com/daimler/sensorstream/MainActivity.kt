@@ -14,6 +14,7 @@ import com.google.android.gms.wearable.*
 import kotlinx.android.synthetic.main.activity_main.*
 import java.io.IOException
 import java.io.ObjectOutputStream
+import java.lang.IllegalArgumentException
 
 class MainActivity : WearableActivity(), SensorEventListener {
     companion object {
@@ -213,14 +214,20 @@ class MainActivity : WearableActivity(), SensorEventListener {
 
         // disable the other inputs
         recording_name.isEnabled = false
-        live_preview.isEnabled = false
+        display_mode.isEnabled = false
 
         val recordingName = recording_name.text.toString()
-        val showLivePreview = live_preview.isChecked
+
+        val displayMode = when (display_mode.selectedItemPosition) {
+            0 -> DisplayMode.NOTHING
+            1 -> DisplayMode.LIVE_PREVIEW
+            2 -> DisplayMode.TAGGING
+            else -> throw IllegalArgumentException()
+        }
 
         // send the
         outputStream?.writeUnshared(SensorStreamOpenedEvent(
-                sensorSelection.toIntArray(), recordingName, showLivePreview))
+                sensorSelection.toIntArray(), recordingName, displayMode))
     }
 
     private fun stopStreaming() {
@@ -247,7 +254,7 @@ class MainActivity : WearableActivity(), SensorEventListener {
 
         // enable the other inputs
         recording_name.isEnabled = true
-        live_preview.isEnabled = true
+        display_mode.isEnabled = true
     }
 
     private fun enableSensor(type: Int) {

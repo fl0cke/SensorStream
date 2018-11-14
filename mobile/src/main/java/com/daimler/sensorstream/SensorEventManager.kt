@@ -1,49 +1,27 @@
 package com.daimler.sensorstream
 
 import android.arch.lifecycle.Lifecycle
+import android.arch.lifecycle.LifecycleObserver
 import android.arch.lifecycle.LifecycleOwner
+import android.arch.lifecycle.OnLifecycleEvent
 import android.os.Handler
 import android.os.Looper
 
 
-object SensorEventManager {
+object SensorEventManager : LifecycleObserver {
 
-    interface Observer {
+    interface SensorDataObserver {
         fun onSensorDataReceived(sensorDataEvent: SensorDataEvent)
-        fun onSensorStreamStarted(sensorStreamOpenedEvent: SensorStreamOpenedEvent)
-        fun onSensorStreamClosed()
     }
 
     var mainHandler = Handler(Looper.getMainLooper())
 
-    private var observer: Observer? = null
-
-    fun observe(lifecycleOwner: LifecycleOwner, observer: Observer) {
-        if (lifecycleOwner.lifecycle.currentState == Lifecycle.State.DESTROYED) {
-            // ignore
-            return
-        }
-
-        // TODO handle lifecycle
-        this.observer = observer
-    }
+    var observer: SensorDataObserver? = null
 
     fun handleSensorDataEvent(sensorDataEvent: SensorDataEvent) {
         // TODO: geht das auch irgendwie besser?
         mainHandler.post {
             observer?.onSensorDataReceived(sensorDataEvent)
-        }
-    }
-
-    fun handleSensorStreamOpenedEvent(sensorStreamOpenedEvent: SensorStreamOpenedEvent) {
-        mainHandler.post {
-            observer?.onSensorStreamStarted(sensorStreamOpenedEvent)
-        }
-    }
-
-    fun handleSensorStreamClosedEvent() {
-        mainHandler.post {
-            observer?.onSensorStreamClosed()
         }
     }
 

@@ -32,25 +32,31 @@
                     android:layout_width="match_parent"
                     android:layout_height="32dp"
                     android:gravity="center"
-                    android:text="Allgemein" />
+                    android:text="Name" />
 
                 <EditText
                     android:id="@+id/recording_name"
-                    android:hint="Name der Aufzeichnung"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
-
-                <CheckBox
-                    android:id="@+id/live_preview"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Live Preview" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="32dp"
                     android:gravity="center"
-                    android:text="Sensoren" />
+                    android:text="Display Mode" />
+
+                <Spinner
+                    android:id="@+id/display_mode"
+                    android:entries="@array/display_modes"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:spinnerMode="dialog" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="32dp"
+                    android:gravity="center"
+                    android:text="Sensors" />
 
                 <CheckBox
                     android:id="@+id/sensor_accelerometer"
@@ -106,23 +112,23 @@
                     android:layout_height="wrap_content"
                     android:text="Geomagnetic Rotation Vector" />
 
-  <!--              <CheckBox
-                    android:id="@+id/sensor_magnetic_field_uncalibrated"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Magnetic Field UC" />
+                <!--              <CheckBox
+                                  android:id="@+id/sensor_magnetic_field_uncalibrated"
+                                  android:layout_width="match_parent"
+                                  android:layout_height="wrap_content"
+                                  android:text="Magnetic Field UC" />
 
-                <CheckBox
-                    android:id="@+id/sensor_gyroscope_uncalibrated"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Gyroscope UC" />
+                              <CheckBox
+                                  android:id="@+id/sensor_gyroscope_uncalibrated"
+                                  android:layout_width="match_parent"
+                                  android:layout_height="wrap_content"
+                                  android:text="Gyroscope UC" />
 
-                <CheckBox
-                    android:id="@+id/sensor_acceleration_uncalibrated"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Acceleration UC" />-->
+                              <CheckBox
+                                  android:id="@+id/sensor_acceleration_uncalibrated"
+                                  android:layout_width="match_parent"
+                                  android:layout_height="wrap_content"
+                                  android:text="Acceleration UC" />-->
 
             </LinearLayout>
 

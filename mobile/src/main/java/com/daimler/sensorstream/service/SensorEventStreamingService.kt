@@ -3,9 +3,7 @@ package com.daimler.sensorstream.service
 import android.app.Service
 import android.content.Intent
 import android.util.Log
-import com.daimler.sensorstream.SensorEventManager
-import com.daimler.sensorstream.SensorDataEvent
-import com.daimler.sensorstream.SensorStreamOpenedEvent
+import com.daimler.sensorstream.*
 import com.google.android.gms.wearable.ChannelClient
 import com.google.android.gms.wearable.MessageClient
 import com.google.android.gms.wearable.MessageEvent
@@ -106,17 +104,19 @@ class SensorEventStreamingService : Service(), MessageClient.OnMessageReceivedLi
                 // read an object containing the selected sensors first
                 val sensorStreamOpenedEvent = dataStream.readObject() as SensorStreamOpenedEvent
 
-                SensorEventManager.handleSensorStreamOpenedEvent(sensorStreamOpenedEvent)
-
+                // create the folder structure
                 val dir = File(getExternalFilesDir(null),
                         "${sensorStreamOpenedEvent.recordingName}_${System.currentTimeMillis() / 1000}")
                 dir.mkdir()
 
+                // open files
                 sensorStreamOpenedEvent.selectedSensorTypes.associateTo(fileWriters) {
                     val file = File(dir, "$it.csv")
                     file.createNewFile()
                     it to file.printWriter()
                 }
+
+                startDisplayActivity(sensorStreamOpenedEvent)
 
                 while (!isInterrupted) {
                     val sensorDataEvent = dataStream.readObject() as SensorDataEvent
@@ -126,6 +126,7 @@ class SensorEventStreamingService : Service(), MessageClient.OnMessageReceivedLi
                     printWriter.print(STRING_SEPARATOR)
                     sensorDataEvent.values.joinTo(printWriter, separator = STRING_SEPARATOR, postfix = "\n")
                     // broadcast the message to the UI
+                    Log.d(LOG_TAG, SensorEventManager.observer.toString())
                     SensorEventManager.handleSensorDataEvent(sensorDataEvent)
                 }
 
@@ -142,8 +143,29 @@ class SensorEventStreamingService : Service(), MessageClient.OnMessageReceivedLi
                 it.close()
             }
 
-            SensorEventManager.handleSensorStreamClosedEvent()
+            // TODO: broadcast? bound service? observer?
+            val intent = Intent(applicationContext, MainActivity::class.java)
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+            startActivity(intent)
 
         }
+    }
+
+    private fun startDisplayActivity(sensorStreamOpenedEvent: SensorStreamOpenedEvent) {
+        val intent = when (sensorStreamOpenedEvent.displayMode) {
+            DisplayMode.NOTHING -> Intent(applicationContext, PlaceholderActivity::class.java)
+            DisplayMode.LIVE_PREVIEW ->
+                Intent(applicationContext, LivePreviewActivity::class.java).apply {
+                    putExtra(LivePreviewActivity.EXTRA_SENSOR_TYPES, sensorStreamOpenedEvent.selectedSensorTypes)
+                }
+            DisplayMode.TAGGING ->
+                Intent(applicationContext, TaggingActivity::class.java).apply {
+                }
+            DisplayMode.VIDEO_CAPTURE ->
+                Intent(applicationContext, VideoCaptureActivity::class.java).apply {
+                }
+        }
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        startActivity(intent)
     }
 }
