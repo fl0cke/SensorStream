@@ -22,9 +22,6 @@ class MainActivity : WearableActivity(), SensorEventListener {
         const val CAPABILITY_STREAM_SENSOR_DATA = "stream_sensor_data"
     }
 
-    private val messageClient by lazy(LazyThreadSafetyMode.NONE) {
-        Wearable.getMessageClient(this)
-    }
     private val channelClient by lazy(LazyThreadSafetyMode.NONE) {
         Wearable.getChannelClient(this)
     }

@@ -5,7 +5,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:keepScreenOn="true"
-    android:id="@+id/camera"
     tools:context=".VideoCaptureActivity">
+
+    <ViewStub
+        android:id="@+id/preview_stub"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout="@layout/view_video_preview">
+
+    </ViewStub>
 
 </FrameLayout>

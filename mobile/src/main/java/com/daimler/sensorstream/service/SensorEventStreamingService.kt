@@ -2,6 +2,7 @@ package com.daimler.sensorstream.service
 
 import android.app.Service
 import android.content.Intent
+import android.hardware.SensorEvent
 import android.util.Log
 import com.daimler.sensorstream.*
 import com.google.android.gms.wearable.ChannelClient
@@ -111,7 +112,8 @@ class SensorEventStreamingService : Service(), MessageClient.OnMessageReceivedLi
 
                 // open files
                 sensorStreamOpenedEvent.selectedSensorTypes.associateTo(fileWriters) {
-                    val file = File(dir, "$it.csv")
+                    val sensorName = SensorMetaData.forType(it).name
+                    val file = File(dir, "$sensorName.csv")
                     file.createNewFile()
                     it to file.printWriter()
                 }
