@@ -2,6 +2,7 @@ package com.daimler.sensorstream.service
 
 import android.app.Service
 import android.content.Intent
+import android.hardware.SensorEvent
 import android.util.Log
 import com.daimler.sensorstream.*
 import com.google.android.gms.wearable.ChannelClient
@@ -50,8 +51,6 @@ class SensorEventStreamingService : Service(), MessageClient.OnMessageReceivedLi
             Log.d(LOG_TAG, "output closed")
         }
     }
-
-    private val outFile = AtomicReference<File>()
 
     override fun onCreate() {
         super.onCreate()
@@ -111,27 +110,11 @@ class SensorEventStreamingService : Service(), MessageClient.OnMessageReceivedLi
 
                 // open files
                 sensorStreamOpenedEvent.selectedSensorTypes.associateTo(fileWriters) {
-                    val file = File(dir, "$it.csv")
+                    val sensorName = SensorMetaData.forType(it).name
+                    val file = File(dir, "$sensorName.csv")
                     file.createNewFile()
                     it to file.printWriter()
                 }
-
-                val intent = when (sensorStreamOpenedEvent.displayMode) {
-                    DisplayMode.NOTHING -> Intent(applicationContext, PlaceholderActivity::class.java)
-                    DisplayMode.LIVE_PREVIEW ->
-                        Intent(applicationContext, LivePreviewActivity::class.java).apply {
-                            putExtra(LivePreviewActivity.EXTRA_SENSOR_TYPES, sensorStreamOpenedEvent.selectedSensorTypes)
-                        }
-                    DisplayMode.TAGGING ->
-                        Intent(applicationContext, TaggingActivity::class.java).apply {
-                        }
-                    DisplayMode.VIDEO_CAPTURE ->
-                        Intent(applicationContext, VideoCaptureActivity::class.java).apply {
-                            putExtra(VideoCaptureActivity.EXTRA_VIDEO_LOCATION, dir.path)
-                        }
-                }
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-                startActivity(intent)
 
                 while (!isInterrupted) {
                     val sensorDataEvent = dataStream.readObject() as SensorDataEvent

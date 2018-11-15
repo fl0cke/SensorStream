@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">SensorStream</string>
+    <string-array name="display_modes">
+        <item>Nothing</item>
+        <item>Live Preview</item>
+        <item>Tagging</item>
+        <item>Video Capture</item>
+    </string-array>
 </resources>

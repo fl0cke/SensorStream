@@ -2,19 +2,21 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:padding="16dp"
+    android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:padding="16dp"
+    android:background="?android:colorBackground"
     tools:context=".TaggingActivity">
 
     <TextView
-        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-        android:id="@+id/label_movement"
-        android:textAlignment="center"
-        app:layout_constraintTop_toTopOf="parent"
+        android:id="@+id/label_turns"
         android:layout_width="match_parent"
-        android:text="Walking"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:text="Turns"
+        android:textAlignment="center"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:id="@+id/left_turn"
@@ -22,175 +24,223 @@
         android:layout_height="64dp"
         android:autoSizeMaxTextSize="24dp"
         android:autoSizeTextType="uniform"
+        android:tag="left_turn"
         android:text="Left Turn"
         android:textColor="@color/colorAccent"
-        app:layout_constraintTop_toBottomOf="@id/label_movement"
         app:layout_constraintEnd_toStartOf="@id/right_turn"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/label_turns" />
 
     <Button
-        app:layout_constraintTop_toBottomOf="@id/label_movement"
         android:id="@+id/right_turn"
         android:layout_width="0dp"
         android:layout_height="64dp"
         android:autoSizeMaxTextSize="24dp"
         android:autoSizeTextType="uniform"
+        android:tag="right_turn"
         android:text="Right Turn"
         android:textColor="@color/colorAccent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/left_turn" />
+        app:layout_constraintStart_toEndOf="@id/left_turn"
+        app:layout_constraintTop_toBottomOf="@id/label_turns" />
 
-    <Button
-        android:id="@+id/stairs_up"
-        android:layout_width="0dp"
-        android:layout_height="64dp"
-        android:autoSizeMaxTextSize="24dp"
-        android:autoSizeTextType="uniform"
-        android:text="Stairs Up"
-        android:textColor="@color/colorAccent"
-        app:layout_constraintTop_toBottomOf="@id/left_turn"
-        app:layout_constraintEnd_toStartOf="@id/stairs_down"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <Button
-        app:layout_constraintTop_toBottomOf="@id/right_turn"
-        android:id="@+id/stairs_down"
-        android:layout_width="0dp"
-        android:layout_height="64dp"
-        android:autoSizeMaxTextSize="24dp"
-        android:autoSizeTextType="uniform"
-        android:text="Stairs Down"
-        android:textColor="@color/colorAccent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/stairs_up" />
 
     <TextView
-        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-        android:id="@+id/label_elevator"
-        android:textAlignment="center"
-        app:layout_constraintTop_toBottomOf="@id/stairs_up"
+        android:id="@+id/label_stairs"
         android:layout_width="match_parent"
-        android:text="Elevator"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:text="Stairs"
+        android:textAlignment="center"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        app:layout_constraintTop_toBottomOf="@id/left_turn" />
 
     <Button
-        app:layout_constraintTop_toBottomOf="@id/label_elevator"
+        android:id="@+id/stairs_up_start"
+        android:layout_width="0dp"
+        android:layout_height="64dp"
+        android:autoSizeMaxTextSize="24dp"
+        android:autoSizeTextType="uniform"
+        android:tag="stairs_up_start"
+        android:text="Stairs Up Start"
+        android:textColor="@color/colorAccent"
+        app:layout_constraintEnd_toStartOf="@id/stairs_up_end"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/label_stairs" />
+
+    <Button
+        android:id="@+id/stairs_up_end"
+        android:layout_width="0dp"
+        android:layout_height="64dp"
+        android:autoSizeMaxTextSize="24dp"
+        android:autoSizeTextType="uniform"
+        android:tag="stairs_up_end"
+        android:text="Stairs Up End"
+        android:textColor="@color/colorAccent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/stairs_up_start"
+        app:layout_constraintTop_toBottomOf="@id/label_stairs" />
+
+    <Button
+        android:id="@+id/stairs_down_start"
+        android:layout_width="0dp"
+        android:layout_height="64dp"
+        android:autoSizeMaxTextSize="24dp"
+        android:autoSizeTextType="uniform"
+        android:tag="stairs_down_start"
+        android:text="Stairs Down Start"
+        android:textColor="@color/colorAccent"
+        app:layout_constraintEnd_toStartOf="@id/stairs_down_end"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/stairs_up_start" />
+
+    <Button
+        android:id="@+id/stairs_down_end"
+        android:layout_width="0dp"
+        android:layout_height="64dp"
+        android:autoSizeMaxTextSize="24dp"
+        android:autoSizeTextType="uniform"
+        android:tag="stairs_down_end"
+        android:text="Stairs Down End"
+        android:textColor="@color/colorAccent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/stairs_down_start"
+        app:layout_constraintTop_toBottomOf="@id/stairs_up_end" />
+
+    <TextView
+        android:id="@+id/label_elevator"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Elevator"
+        android:textAlignment="center"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        app:layout_constraintTop_toBottomOf="@id/stairs_down_end" />
+
+    <Button
         android:id="@+id/elevator_up_start"
         android:layout_width="0dp"
         android:layout_height="64dp"
         android:autoSizeMaxTextSize="24dp"
         android:autoSizeTextType="uniform"
+        android:tag="elevator_up_start"
         android:text="Elevator Up Start"
         android:textColor="@color/colorAccent"
         app:layout_constraintEnd_toStartOf="@id/elevator_up_stop"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/label_elevator" />
 
     <Button
-        app:layout_constraintTop_toBottomOf="@id/label_elevator"
         android:id="@+id/elevator_up_stop"
         android:layout_width="0dp"
         android:layout_height="64dp"
         android:autoSizeMaxTextSize="24dp"
         android:autoSizeTextType="uniform"
+        android:tag="elevator_up_stop"
         android:text="Elevator Up Stop"
         android:textColor="@color/colorAccent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/elevator_up_start"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/label_elevator" />
 
     <Button
-        app:layout_constraintTop_toBottomOf="@id/elevator_up_start"
         android:id="@+id/elevator_down_start"
         android:layout_width="0dp"
         android:layout_height="64dp"
         android:autoSizeMaxTextSize="24dp"
         android:autoSizeTextType="uniform"
+        android:tag="elevator_down_start"
         android:text="Elevator Down Start"
         android:textColor="@color/colorAccent"
         app:layout_constraintEnd_toStartOf="@id/elevator_down_stop"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/elevator_up_start" />
 
     <Button
-        app:layout_constraintTop_toBottomOf="@id/elevator_up_stop"
         android:id="@+id/elevator_down_stop"
         android:layout_width="0dp"
         android:layout_height="64dp"
         android:autoSizeMaxTextSize="24dp"
         android:autoSizeTextType="uniform"
+        android:tag="elevator_down_stop"
         android:text="Elevator Down Stop"
         android:textColor="@color/colorAccent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/elevator_down_start"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/elevator_up_stop" />
 
     <TextView
-        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         android:id="@+id/label_mics"
-        android:textAlignment="center"
-        app:layout_constraintTop_toBottomOf="@id/elevator_down_stop"
         android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:text="Miscellaneous"
-        android:layout_height="wrap_content" />
+        android:textAlignment="center"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        app:layout_constraintTop_toBottomOf="@id/elevator_down_stop" />
 
     <Button
-        app:layout_constraintTop_toBottomOf="@id/label_mics"
         android:id="@+id/opening_door"
         android:layout_width="0dp"
         android:layout_height="64dp"
         android:autoSizeMaxTextSize="24dp"
         android:autoSizeTextType="uniform"
+        android:tag="opening_door"
         android:text="Opening Door"
         android:textColor="@color/colorAccent"
         app:layout_constraintEnd_toStartOf="@id/waiting"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/label_mics" />
 
     <Button
-        app:layout_constraintTop_toBottomOf="@id/label_mics"
         android:id="@+id/waiting"
         android:layout_width="0dp"
         android:layout_height="64dp"
         android:autoSizeMaxTextSize="24dp"
         android:autoSizeTextType="uniform"
+        android:tag="waiting"
         android:text="Waiting"
         android:textColor="@color/colorAccent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/opening_door"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/label_mics" />
 
 
     <Button
-        app:layout_constraintTop_toBottomOf="@id/opening_door"
         android:id="@+id/raising_hand"
         android:layout_width="0dp"
         android:layout_height="64dp"
         android:autoSizeMaxTextSize="24dp"
         android:autoSizeTextType="uniform"
+        android:tag="raising_hand"
         android:text="Raising Hand"
         android:textColor="@color/colorAccent"
         app:layout_constraintEnd_toStartOf="@id/turning_on_the_spot"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/opening_door" />
 
     <Button
-        app:layout_constraintTop_toBottomOf="@id/waiting"
         android:id="@+id/turning_on_the_spot"
         android:layout_width="0dp"
         android:layout_height="64dp"
         android:autoSizeMaxTextSize="24dp"
         android:autoSizeTextType="uniform"
+        android:tag="turning_on_the_spot"
         android:text="Turning on the spot"
         android:textColor="@color/colorAccent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/raising_hand"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/waiting" />
 
     <Button
-        app:layout_constraintTop_toBottomOf="@id/turning_on_the_spot"
-        android:id="@+id/something_else"
+        android:id="@+id/sync"
         android:layout_width="0dp"
         android:layout_height="64dp"
         android:autoSizeMaxTextSize="24dp"
         android:autoSizeTextType="uniform"
-        android:text="Something Else"
+        android:tag="sync"
+        android:text="Sync"
         android:textColor="@color/colorAccent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
+        app:layout_constraintTop_toBottomOf="@id/turning_on_the_spot" />
 
 
 </android.support.constraint.ConstraintLayout>
