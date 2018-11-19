@@ -126,6 +126,7 @@ class SensorEventStreamingService : Service(), MessageClient.OnMessageReceivedLi
                         }
                     DisplayMode.TAGGING ->
                         Intent(applicationContext, TaggingActivity::class.java).apply {
+                            putExtra(TaggingActivity.EXTRA_TAG_LOCATION, dir.path)
                         }
                     DisplayMode.VIDEO_CAPTURE ->
                         Intent(applicationContext, VideoCaptureActivity::class.java).apply {

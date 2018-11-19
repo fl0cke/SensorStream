@@ -29,3 +29,6 @@ fun ViewGroup.asSequence(): Sequence<View> = object : Sequence<View> {
         }
     }
 }
+
+val ViewGroup.views: List<View>
+    get() = asSequence().toList()

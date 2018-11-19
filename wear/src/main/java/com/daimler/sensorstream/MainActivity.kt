@@ -35,6 +35,7 @@ class MainActivity : WearableActivity(), SensorEventListener {
 
     private var channel: ChannelClient.Channel? = null
     private var outputStream: ObjectOutputStream? = null
+    private var highFreqModeEnabled = false
 
     private val callback = object : ChannelClient.ChannelCallback() {
         override fun onChannelClosed(p0: ChannelClient.Channel, p1: Int, p2: Int) {
@@ -120,6 +121,7 @@ class MainActivity : WearableActivity(), SensorEventListener {
             channelClient.getOutputStream(it!!)
         }.addOnSuccessListener {
             Log.d(LOG_TAG, "successfully opened output stream to node ${node.id}")
+            // TODO: buffered stream?
             outputStream = ObjectOutputStream(it)
             startStreaming()
         }.addOnFailureListener {
@@ -138,6 +140,17 @@ class MainActivity : WearableActivity(), SensorEventListener {
     }
 
     private fun startStreaming() {
+        val displayMode = when (display_mode.selectedItemPosition) {
+            0 -> DisplayMode.NOTHING
+            1 -> DisplayMode.LIVE_PREVIEW
+            2 -> DisplayMode.TAGGING
+            3 -> DisplayMode.VIDEO_CAPTURE
+            else -> throw IllegalArgumentException()
+        }
+
+        // don't enable high frequency mode if we are doing a live preview
+        highFreqModeEnabled = displayMode != DisplayMode.LIVE_PREVIEW
+
         val sensorSelection: MutableList<Int> = mutableListOf()
 
         // conditionally enable each sensor
@@ -177,18 +190,18 @@ class MainActivity : WearableActivity(), SensorEventListener {
             sensorSelection.add(Sensor.TYPE_GEOMAGNETIC_ROTATION_VECTOR)
             enableSensor(Sensor.TYPE_GEOMAGNETIC_ROTATION_VECTOR)
         }
-      /*  if (sensor_magnetic_field_uncalibrated.isChecked) {
-            sensorSelection.add(Sensor.TYPE_MAGNETIC_FIELD_UNCALIBRATED)
-            enableSensor(Sensor.TYPE_MAGNETIC_FIELD_UNCALIBRATED)
-        }
-        if (sensor_gyroscope_uncalibrated.isChecked) {
-            sensorSelection.add(Sensor.TYPE_GYROSCOPE_UNCALIBRATED)
-            enableSensor(Sensor.TYPE_GYROSCOPE_UNCALIBRATED)
-        }
-        if (sensor_acceleration_uncalibrated.isChecked) {
-            sensorSelection.add(Sensor.TYPE_ACCELEROMETER_UNCALIBRATED)
-            enableSensor(Sensor.TYPE_ACCELEROMETER_UNCALIBRATED)
-        }*/
+        /*  if (sensor_magnetic_field_uncalibrated.isChecked) {
+              sensorSelection.add(Sensor.TYPE_MAGNETIC_FIELD_UNCALIBRATED)
+              enableSensor(Sensor.TYPE_MAGNETIC_FIELD_UNCALIBRATED)
+          }
+          if (sensor_gyroscope_uncalibrated.isChecked) {
+              sensorSelection.add(Sensor.TYPE_GYROSCOPE_UNCALIBRATED)
+              enableSensor(Sensor.TYPE_GYROSCOPE_UNCALIBRATED)
+          }
+          if (sensor_acceleration_uncalibrated.isChecked) {
+              sensorSelection.add(Sensor.TYPE_ACCELEROMETER_UNCALIBRATED)
+              enableSensor(Sensor.TYPE_ACCELEROMETER_UNCALIBRATED)
+          }*/
 
         // disable all checkboxes
         sensor_accelerometer.isEnabled = false
@@ -200,9 +213,9 @@ class MainActivity : WearableActivity(), SensorEventListener {
         sensor_game_rotation_vector.isEnabled = false
         sensor_rotation_vector.isEnabled = false
         sensor_geomagnetic_rotation_vector.isEnabled = false
-     /*   sensor_acceleration_uncalibrated.isEnabled = false
-        sensor_gyroscope_uncalibrated.isEnabled = false
-        sensor_magnetic_field_uncalibrated.isEnabled = false*/
+        /*   sensor_acceleration_uncalibrated.isEnabled = false
+           sensor_gyroscope_uncalibrated.isEnabled = false
+           sensor_magnetic_field_uncalibrated.isEnabled = false*/
 
         // show the stop button
         btn_start.visibility = View.GONE
@@ -214,14 +227,6 @@ class MainActivity : WearableActivity(), SensorEventListener {
         display_mode.isEnabled = false
 
         val recordingName = recording_name.text.toString()
-
-        val displayMode = when (display_mode.selectedItemPosition) {
-            0 -> DisplayMode.NOTHING
-            1 -> DisplayMode.LIVE_PREVIEW
-            2 -> DisplayMode.TAGGING
-            3 -> DisplayMode.VIDEO_CAPTURE
-            else -> throw IllegalArgumentException()
-        }
 
         // send the
         outputStream?.writeUnshared(SensorStreamOpenedEvent(
@@ -257,7 +262,9 @@ class MainActivity : WearableActivity(), SensorEventListener {
 
     private fun enableSensor(type: Int) {
         val sensor = sensorManager.getDefaultSensor(type)
-        sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_UI)
+        val delay = if (highFreqModeEnabled)
+            SensorManager.SENSOR_DELAY_FASTEST else SensorManager.SENSOR_DELAY_UI
+        sensorManager.registerListener(this, sensor, delay)
     }
 
     private fun disableAllSensors() {
