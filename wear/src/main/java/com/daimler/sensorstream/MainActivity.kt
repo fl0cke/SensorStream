@@ -12,6 +12,7 @@ import android.view.View
 import android.widget.Toast
 import com.google.android.gms.wearable.*
 import kotlinx.android.synthetic.main.activity_main.*
+import java.io.BufferedOutputStream
 import java.io.IOException
 import java.io.ObjectOutputStream
 import java.lang.IllegalArgumentException
@@ -121,8 +122,9 @@ class MainActivity : WearableActivity(), SensorEventListener {
             channelClient.getOutputStream(it!!)
         }.addOnSuccessListener {
             Log.d(LOG_TAG, "successfully opened output stream to node ${node.id}")
-            // TODO: buffered stream?
-            outputStream = ObjectOutputStream(it)
+            outputStream = ObjectOutputStream(
+                    if (highFreqModeEnabled) BufferedOutputStream(it)
+                    else it)
             startStreaming()
         }.addOnFailureListener {
             Log.d(LOG_TAG, "failed to open output stream to node ${node.id}")
@@ -277,6 +279,9 @@ class MainActivity : WearableActivity(), SensorEventListener {
 
     override fun onSensorChanged(event: SensorEvent) {
         val sensorStreamEvent = SensorDataEvent(event.sensor.type, event.timestamp, event.values.copyOf())
+        println(event.values.joinToString() {
+            String.format("%.2f", it)
+        })
         try {
             outputStream?.writeUnshared(sensorStreamEvent)
         } catch (e: IOException) {
