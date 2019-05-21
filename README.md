@@ -4,5 +4,5 @@ Features a live-preview and simultanous video recording mode.
 
 ## Requirements
 
-- Android Stude 3.2
+- Android Studio 3.2
 - A smartwatch running Android Wear 2.1+
